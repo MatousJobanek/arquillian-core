@@ -84,6 +84,8 @@ public interface TestRunnerAdaptor {
      */
     TestResult test(TestMethodExecutor testMethodExecutor) throws Exception;
 
+    void fire(Object event);
+
     /**
      * Fire any custom Test Lifecycle event.<br/>
      * <br/>

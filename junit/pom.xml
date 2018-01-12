@@ -23,5 +23,6 @@
     <module>core</module>
     <module>standalone</module>
     <module>container</module>
+    <module>common</module>
   </modules>
 </project>

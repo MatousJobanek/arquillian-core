@@ -26,20 +26,14 @@ import org.jboss.arquillian.junit.event.AfterRules;
 import org.jboss.arquillian.junit.event.BeforeRules;
 import org.jboss.arquillian.junit.event.RulesEnrichment;
 import org.jboss.arquillian.test.spi.LifecycleMethodExecutor;
-import org.jboss.arquillian.test.spi.TestMethodExecutor;
-import org.jboss.arquillian.test.spi.TestResult;
-import org.jboss.arquillian.test.spi.TestResult.Status;
 import org.jboss.arquillian.test.spi.TestRunnerAdaptor;
-import org.jboss.arquillian.test.spi.execution.SkippedTestExecutionException;
-import org.junit.internal.AssumptionViolatedException;
 import org.junit.internal.runners.model.MultipleFailureException;
 import org.junit.internal.runners.model.ReflectiveCallable;
 import org.junit.internal.runners.statements.Fail;
 import org.junit.runner.Description;
-import org.junit.runner.Result;
-import org.junit.runner.notification.RunListener;
 import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.BlockJUnit4ClassRunner;
+import org.junit.runners.model.FrameworkField;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.Statement;
@@ -80,7 +74,7 @@ public class Arquillian extends BlockJUnit4ClassRunner {
 
     @Override
     public void run(final RunNotifier notifier) {
-        if (State.hasAnyArquillianRule(this.getTestClass())) {
+        if (hasAnyArquillianRule(this.getTestClass())) {
             throw new RuntimeException(String.format("TestClass: %s contains Arquillian runner and Arquillian Rule."
                 + " Arquillian doesn't support @RunWith(Arquillian.class) and ArquillianTestClass or "
                     + "ArquillianTest to use at the same time. You have to decide whether you want use runner:"
@@ -113,6 +107,15 @@ public class Arquillian extends BlockJUnit4ClassRunner {
         if (State.hasTestAdaptor()) {
             super.run(notifier);
         }
+    }
+
+    private boolean hasAnyArquillianRule(org.junit.runners.model.TestClass testClass) {
+        for (FrameworkField field : testClass.getAnnotatedFields()) {
+            if (ArquillianTestClass.class.equals(field.getType()) || ArquillianTest.class.equals(field.getType())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
